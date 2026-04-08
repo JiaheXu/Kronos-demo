@@ -1,9 +1,13 @@
 import gc
+import functools
+import json
 import os
 import re
 import subprocess
+import threading
 import time
 from datetime import datetime, timezone, timedelta
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -18,25 +22,53 @@ from model import KronosTokenizer, Kronos, KronosPredictor
 Config = {
     "REPO_PATH": Path(__file__).parent.resolve(),
     "MODEL_PATH": "../Kronos_model",
+    "OUTPUT_PATH": Path(__file__).parent.resolve() / "results",
     "SYMBOL": 'BTCUSDT',
     "INTERVAL": '1h',
     "HIST_POINTS": 360,
     "PRED_HORIZON": 24,
     "N_PREDICTIONS": 30,
     "VOL_WINDOW": 24,
+    "SERVER_HOST": "0.0.0.0",
+    "SERVER_PORT": 8000,
+    "MODELS": [
+        {
+            "key": "mini",
+            "label": "Kronos-mini",
+            "tokenizer_id": "NeoQuasar/Kronos-Tokenizer-2k",
+            "model_id": "NeoQuasar/Kronos-mini",
+        },
+        {
+            "key": "base",
+            "label": "Kronos-base",
+            "tokenizer_id": "NeoQuasar/Kronos-Tokenizer-base",
+            "model_id": "NeoQuasar/Kronos-base",
+        },
+    ],
 }
 
 
-def load_model():
-    """Loads the Kronos model and tokenizer."""
-    print("Loading Kronos model...")
-    tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-2k", cache_dir=Config["MODEL_PATH"])
-    model = Kronos.from_pretrained("NeoQuasar/Kronos-mini", cache_dir=Config["MODEL_PATH"])
-    tokenizer.eval()
-    model.eval()
-    predictor = KronosPredictor(model, tokenizer, device="cpu", max_context=512)
-    print("Model loaded successfully.")
-    return predictor
+def load_models():
+    """Loads all configured Kronos models and tokenizers."""
+    predictors = {}
+    for model_config in Config["MODELS"]:
+        print(f"Loading {model_config['label']}...")
+        tokenizer = KronosTokenizer.from_pretrained(
+            model_config["tokenizer_id"],
+            cache_dir=Config["MODEL_PATH"],
+        )
+        model = Kronos.from_pretrained(
+            model_config["model_id"],
+            cache_dir=Config["MODEL_PATH"],
+        )
+        tokenizer.eval()
+        model.eval()
+        predictors[model_config["key"]] = {
+            "config": model_config,
+            "predictor": KronosPredictor(model, tokenizer, device="cpu", max_context=512),
+        }
+        print(f"{model_config['label']} loaded successfully.")
+    return predictors
 
 
 def make_prediction(df, predictor):
@@ -129,9 +161,9 @@ def calculate_metrics(hist_df, close_preds_df, v_close_preds_df):
     return upside_prob, vol_amp_prob
 
 
-def create_plot(hist_df, close_preds_df, volume_preds_df):
+def create_plot(hist_df, close_preds_df, volume_preds_df, model_config):
     """Generates and saves a comprehensive forecast chart."""
-    print("Generating comprehensive forecast chart...")
+    print(f"Generating comprehensive forecast chart for {model_config['label']}...")
     # plt.style.use('seaborn-v0_8-whitegrid')
     fig, (ax1, ax2) = plt.subplots(
         2, 1, figsize=(15, 10), sharex=True,
@@ -146,7 +178,11 @@ def create_plot(hist_df, close_preds_df, volume_preds_df):
     mean_preds = close_preds_df.mean(axis=1)
     ax1.plot(pred_time, mean_preds, color='darkorange', linestyle='-', label='Mean Forecast')
     ax1.fill_between(pred_time, close_preds_df.min(axis=1), close_preds_df.max(axis=1), color='darkorange', alpha=0.2, label='Forecast Range (Min-Max)')
-    ax1.set_title(f'{Config["SYMBOL"]} Probabilistic Price & Volume Forecast (Next {Config["PRED_HORIZON"]} Hours)', fontsize=16, weight='bold')
+    ax1.set_title(
+        f'{Config["SYMBOL"]} {model_config["label"]} Forecast (Next {Config["PRED_HORIZON"]} Hours)',
+        fontsize=16,
+        weight='bold'
+    )
     ax1.set_ylabel('Price (USDT)')
     ax1.legend()
     ax1.grid(True, which='both', linestyle='--', linewidth=0.5)
@@ -164,42 +200,87 @@ def create_plot(hist_df, close_preds_df, volume_preds_df):
         ax.tick_params(axis='x', rotation=30)
 
     fig.tight_layout()
-    chart_path = Config["REPO_PATH"] / 'prediction_chart.png'
+    chart_path = Config["REPO_PATH"] / f'prediction_chart_{model_config["key"]}.png'
     fig.savefig(chart_path, dpi=120)
     plt.close(fig)
     print(f"Chart saved to: {chart_path}")
+    return chart_path
 
 
-def update_html(upside_prob, vol_amp_prob):
-    """
-    Updates the index.html file with the latest metrics and timestamp.
-    This version uses a more robust lambda function for replacement to avoid formatting errors.
-    """
+def save_prediction_results(df_for_model, close_preds_df, volume_preds_df, model_config):
+    """Saves forecast outputs locally for later inspection."""
+    print(f"Saving forecast outputs for {model_config['label']}...")
+    output_dir = Config["OUTPUT_PATH"]
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    last_timestamp = df_for_model['timestamps'].max()
+    pred_time = pd.date_range(
+        start=last_timestamp + pd.Timedelta(hours=1),
+        periods=Config["PRED_HORIZON"],
+        freq='H'
+    )
+
+    result_df = pd.DataFrame({
+        'timestamp': pred_time,
+        'close_mean': close_preds_df.mean(axis=1).to_numpy(),
+        'close_min': close_preds_df.min(axis=1).to_numpy(),
+        'close_max': close_preds_df.max(axis=1).to_numpy(),
+        'volume_mean': volume_preds_df.mean(axis=1).to_numpy(),
+    })
+
+    csv_path = output_dir / f'{model_config["key"]}_forecast.csv'
+    json_path = output_dir / f'{model_config["key"]}_forecast.json'
+
+    result_df.to_csv(csv_path, index=False)
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(result_df.to_dict(orient='records'), f, indent=2, default=str)
+
+    print(f"Saved forecast table to: {csv_path}")
+    print(f"Saved forecast JSON to: {json_path}")
+    return csv_path, json_path
+
+
+def update_html(model_results):
+    """Updates the dashboard with the latest per-model metrics and artifact paths."""
     print("Updating index.html...")
     html_path = Config["REPO_PATH"] / 'index.html'
     now_utc_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-    upside_prob_str = f'{upside_prob:.1%}'
-    vol_amp_prob_str = f'{vol_amp_prob:.1%}'
 
     with open(html_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Robustly replace content using lambda functions
     content = re.sub(
         r'(<strong id="update-time">).*?(</strong>)',
         lambda m: f'{m.group(1)}{now_utc_str}{m.group(2)}',
         content
     )
-    content = re.sub(
-        r'(<p class="metric-value" id="upside-prob">).*?(</p>)',
-        lambda m: f'{m.group(1)}{upside_prob_str}{m.group(2)}',
-        content
-    )
-    content = re.sub(
-        r'(<p class="metric-value" id="vol-amp-prob">).*?(</p>)',
-        lambda m: f'{m.group(1)}{vol_amp_prob_str}{m.group(2)}',
-        content
-    )
+
+    for model_key, result in model_results.items():
+        content = re.sub(
+            rf'(<p class="metric-value" id="{model_key}-upside-prob">).*?(</p>)',
+            lambda m, value=f'{result["upside_prob"]:.1%}': f'{m.group(1)}{value}{m.group(2)}',
+            content
+        )
+        content = re.sub(
+            rf'(<p class="metric-value" id="{model_key}-vol-amp-prob">).*?(</p>)',
+            lambda m, value=f'{result["vol_amp_prob"]:.1%}': f'{m.group(1)}{value}{m.group(2)}',
+            content
+        )
+        content = re.sub(
+            rf'(<p class="metric-value" id="{model_key}-mean-price">).*?(</p>)',
+            lambda m, value=f'{result["final_mean_close"]:,.2f}': f'{m.group(1)}{value}{m.group(2)}',
+            content
+        )
+        content = re.sub(
+            rf'(<a id="{model_key}-csv-link" href=").*?(")',
+            lambda m, value=result["csv_href"]: f'{m.group(1)}{value}{m.group(2)}',
+            content
+        )
+        content = re.sub(
+            rf'(<a id="{model_key}-json-link" href=").*?(")',
+            lambda m, value=result["json_href"]: f'{m.group(1)}{value}{m.group(2)}',
+            content
+        )
 
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -211,7 +292,16 @@ def git_commit_and_push(commit_message):
     print("Performing Git operations...")
     try:
         os.chdir(Config["REPO_PATH"])
-        subprocess.run(['git', 'add', 'prediction_chart.png', 'index.html'], check=True, capture_output=True, text=True)
+        add_targets = [
+            'prediction_chart_mini.png',
+            'prediction_chart_base.png',
+            'index.html',
+            'results/mini_forecast.csv',
+            'results/mini_forecast.json',
+            'results/base_forecast.csv',
+            'results/base_forecast.json',
+        ]
+        subprocess.run(['git', 'add', *add_targets], check=True, capture_output=True, text=True)
         commit_result = subprocess.run(['git', 'commit', '-m', commit_message], check=True, capture_output=True, text=True)
         print(commit_result.stdout)
         push_result = subprocess.run(['git', 'push'], check=True, capture_output=True, text=True)
@@ -225,37 +315,72 @@ def git_commit_and_push(commit_message):
             print(f"A Git error occurred:\n--- STDOUT ---\n{e.stdout}\n--- STDERR ---\n{e.stderr}")
 
 
-def main_task(model):
+class NoCacheRequestHandler(SimpleHTTPRequestHandler):
+    """Serves the dashboard files and disables browser caching for live updates."""
+
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
+
+def start_http_server():
+    """Starts a static file server for the generated dashboard."""
+    handler = functools.partial(NoCacheRequestHandler, directory=str(Config["REPO_PATH"]))
+    server = ThreadingHTTPServer((Config["SERVER_HOST"], Config["SERVER_PORT"]), handler)
+
+    thread = threading.Thread(target=server.serve_forever, name="dashboard-http-server", daemon=True)
+    thread.start()
+
+    print(
+        f"Serving dashboard from {Config['REPO_PATH']} at "
+        f"http://127.0.0.1:{Config['SERVER_PORT']}/"
+    )
+    return server
+
+
+def main_task(models):
     """Executes one full update cycle."""
     print("\n" + "=" * 60 + f"\nStarting update task at {datetime.now(timezone.utc)}\n" + "=" * 60)
     df_full = fetch_binance_data()
     df_for_model = df_full.iloc[:-1]
-
-    close_preds, volume_preds, v_close_preds = make_prediction(df_for_model, model)
-
     hist_df_for_plot = df_for_model.tail(Config["HIST_POINTS"])
     hist_df_for_metrics = df_for_model.tail(Config["VOL_WINDOW"])
+    model_results = {}
 
-    upside_prob, vol_amp_prob = calculate_metrics(hist_df_for_metrics, close_preds, v_close_preds)
-    create_plot(hist_df_for_plot, close_preds, volume_preds)
-    update_html(upside_prob, vol_amp_prob)
+    for model_key, model_bundle in models.items():
+        model_config = model_bundle["config"]
+        predictor = model_bundle["predictor"]
+
+        close_preds, volume_preds, v_close_preds = make_prediction(df_for_model, predictor)
+        upside_prob, vol_amp_prob = calculate_metrics(hist_df_for_metrics, close_preds, v_close_preds)
+        create_plot(hist_df_for_plot, close_preds, volume_preds, model_config)
+        csv_path, json_path = save_prediction_results(df_for_model, close_preds, volume_preds, model_config)
+
+        model_results[model_key] = {
+            "upside_prob": upside_prob,
+            "vol_amp_prob": vol_amp_prob,
+            "final_mean_close": float(close_preds.mean(axis=1).iloc[-1]),
+            "csv_href": csv_path.relative_to(Config["REPO_PATH"]).as_posix(),
+            "json_href": json_path.relative_to(Config["REPO_PATH"]).as_posix(),
+        }
+
+        del close_preds, volume_preds, v_close_preds
+        gc.collect()
+
+    update_html(model_results)
 
     commit_message = f"Auto-update forecast for {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"
     git_commit_and_push(commit_message)
 
-    # --- 新增的内存清理步骤 ---
-    # 显式删除大的DataFrame对象，帮助垃圾回收器
-    del df_full, df_for_model, close_preds, volume_preds, v_close_preds
-    del hist_df_for_plot, hist_df_for_metrics
-
-    # 强制执行垃圾回收
+    del df_full, df_for_model, hist_df_for_plot, hist_df_for_metrics, model_results
     gc.collect()
-    # --- 内存清理结束 ---
 
     print("-" * 60 + "\n--- Task completed successfully ---\n" + "-" * 60 + "\n")
 
 
-def run_scheduler(model):
+def run_scheduler(models):
     """A continuous scheduler that runs the main task hourly."""
     while True:
         now = datetime.now(timezone.utc)
@@ -268,7 +393,7 @@ def run_scheduler(model):
             time.sleep(sleep_seconds)
 
         try:
-            main_task(model)
+            main_task(models)
         except Exception as e:
             print(f"\n!!!!!! A critical error occurred in the main task !!!!!!!")
             print(f"Error: {e}")
@@ -282,7 +407,13 @@ def run_scheduler(model):
 if __name__ == '__main__':
     model_path = Path(Config["MODEL_PATH"])
     model_path.mkdir(parents=True, exist_ok=True)
+    Config["OUTPUT_PATH"].mkdir(parents=True, exist_ok=True)
 
-    loaded_model = load_model()
-    main_task(loaded_model)  # Run once on startup
-    run_scheduler(loaded_model)  # Start the schedule
+    http_server = start_http_server()
+    loaded_models = load_models()
+    try:
+        main_task(loaded_models)  # Run once on startup
+        run_scheduler(loaded_models)  # Start the schedule
+    finally:
+        http_server.shutdown()
+        http_server.server_close()
