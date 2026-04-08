@@ -1,170 +1,170 @@
 [
   {
-    "timestamp": "2026-04-08 11:00:00",
-    "close_mean": 71698.4140625,
-    "close_min": 71108.625,
-    "close_max": 72270.3046875,
-    "volume_mean": 136.95175170898438
-  },
-  {
     "timestamp": "2026-04-08 11:15:00",
-    "close_mean": 71674.296875,
-    "close_min": 71147.34375,
-    "close_max": 72285.015625,
-    "volume_mean": 126.4720458984375
+    "close_mean": 71788.09375,
+    "close_min": 71470.71875,
+    "close_max": 72167.5390625,
+    "volume_mean": 140.8946990966797
   },
   {
     "timestamp": "2026-04-08 11:30:00",
-    "close_mean": 71676.8515625,
-    "close_min": 71199.328125,
-    "close_max": 72353.2109375,
-    "volume_mean": 127.3441390991211
+    "close_mean": 71822.78125,
+    "close_min": 71437.5390625,
+    "close_max": 72348.359375,
+    "volume_mean": 149.3500213623047
   },
   {
     "timestamp": "2026-04-08 11:45:00",
-    "close_mean": 71677.90625,
-    "close_min": 71303.0625,
-    "close_max": 72154.65625,
-    "volume_mean": 134.62640380859375
+    "close_mean": 71788.15625,
+    "close_min": 70839.3828125,
+    "close_max": 72347.8046875,
+    "volume_mean": 132.89028930664062
   },
   {
     "timestamp": "2026-04-08 12:00:00",
-    "close_mean": 71718.625,
-    "close_min": 71241.140625,
-    "close_max": 72319.234375,
-    "volume_mean": 172.8997039794922
+    "close_mean": 71782.7265625,
+    "close_min": 71157.1484375,
+    "close_max": 72268.515625,
+    "volume_mean": 198.80612182617188
   },
   {
     "timestamp": "2026-04-08 12:15:00",
-    "close_mean": 71725.5,
-    "close_min": 71175.6015625,
-    "close_max": 72253.0859375,
-    "volume_mean": 145.54678344726562
+    "close_mean": 71750.765625,
+    "close_min": 71050.171875,
+    "close_max": 72288.640625,
+    "volume_mean": 161.18211364746094
   },
   {
     "timestamp": "2026-04-08 12:30:00",
-    "close_mean": 71684.515625,
-    "close_min": 71167.8359375,
-    "close_max": 72054.8671875,
-    "volume_mean": 142.8186492919922
+    "close_mean": 71808.0078125,
+    "close_min": 71230.859375,
+    "close_max": 72424.78125,
+    "volume_mean": 149.0473175048828
   },
   {
     "timestamp": "2026-04-08 12:45:00",
-    "close_mean": 71699.046875,
-    "close_min": 71048.9140625,
-    "close_max": 72327.6171875,
-    "volume_mean": 149.2193145751953
+    "close_mean": 71751.328125,
+    "close_min": 71195.421875,
+    "close_max": 72313.7109375,
+    "volume_mean": 163.86279296875
   },
   {
     "timestamp": "2026-04-08 13:00:00",
-    "close_mean": 71691.0,
-    "close_min": 70873.9296875,
-    "close_max": 72421.5234375,
-    "volume_mean": 180.3575897216797
+    "close_mean": 71756.4453125,
+    "close_min": 71000.21875,
+    "close_max": 72387.0390625,
+    "volume_mean": 194.36370849609375
   },
   {
     "timestamp": "2026-04-08 13:15:00",
-    "close_mean": 71737.9765625,
-    "close_min": 71104.71875,
-    "close_max": 72263.21875,
-    "volume_mean": 186.01649475097656
+    "close_mean": 71674.96875,
+    "close_min": 70464.5,
+    "close_max": 72282.625,
+    "volume_mean": 197.4170684814453
   },
   {
     "timestamp": "2026-04-08 13:30:00",
-    "close_mean": 71645.0,
-    "close_min": 70902.6328125,
-    "close_max": 72244.5546875,
-    "volume_mean": 201.22500610351562
+    "close_mean": 71694.875,
+    "close_min": 70725.3671875,
+    "close_max": 72561.0546875,
+    "volume_mean": 225.42242431640625
   },
   {
     "timestamp": "2026-04-08 13:45:00",
-    "close_mean": 71704.1171875,
-    "close_min": 70867.546875,
-    "close_max": 72274.6015625,
-    "volume_mean": 220.94664001464844
+    "close_mean": 71603.78125,
+    "close_min": 70567.3515625,
+    "close_max": 72389.6875,
+    "volume_mean": 235.7299346923828
   },
   {
     "timestamp": "2026-04-08 14:00:00",
-    "close_mean": 71705.5078125,
-    "close_min": 70787.3515625,
-    "close_max": 72461.8984375,
-    "volume_mean": 232.9665069580078
+    "close_mean": 71609.703125,
+    "close_min": 70273.40625,
+    "close_max": 72379.75,
+    "volume_mean": 256.2523498535156
   },
   {
     "timestamp": "2026-04-08 14:15:00",
-    "close_mean": 71656.6640625,
-    "close_min": 70876.8828125,
-    "close_max": 72261.7890625,
-    "volume_mean": 223.69944763183594
+    "close_mean": 71576.5390625,
+    "close_min": 70185.8046875,
+    "close_max": 72627.09375,
+    "volume_mean": 247.87135314941406
   },
   {
     "timestamp": "2026-04-08 14:30:00",
-    "close_mean": 71661.515625,
-    "close_min": 70861.21875,
-    "close_max": 72393.953125,
-    "volume_mean": 254.95037841796875
+    "close_mean": 71522.8203125,
+    "close_min": 70498.3125,
+    "close_max": 72580.2578125,
+    "volume_mean": 243.94264221191406
   },
   {
     "timestamp": "2026-04-08 14:45:00",
-    "close_mean": 71637.3515625,
-    "close_min": 70763.6953125,
-    "close_max": 72190.9609375,
-    "volume_mean": 265.0729064941406
+    "close_mean": 71592.5234375,
+    "close_min": 70451.96875,
+    "close_max": 72818.21875,
+    "volume_mean": 247.66017150878906
   },
   {
     "timestamp": "2026-04-08 15:00:00",
-    "close_mean": 71668.3046875,
-    "close_min": 70745.9375,
-    "close_max": 72665.734375,
-    "volume_mean": 328.0223388671875
+    "close_mean": 71527.984375,
+    "close_min": 70564.0390625,
+    "close_max": 72960.5546875,
+    "volume_mean": 334.4957275390625
   },
   {
     "timestamp": "2026-04-08 15:15:00",
-    "close_mean": 71665.9921875,
-    "close_min": 70330.4453125,
-    "close_max": 72513.96875,
-    "volume_mean": 236.05690002441406
+    "close_mean": 71496.953125,
+    "close_min": 70602.828125,
+    "close_max": 72920.2890625,
+    "volume_mean": 270.9484558105469
   },
   {
     "timestamp": "2026-04-08 15:30:00",
-    "close_mean": 71695.328125,
-    "close_min": 70280.0625,
-    "close_max": 72717.4453125,
-    "volume_mean": 271.33489990234375
+    "close_mean": 71611.3359375,
+    "close_min": 70522.515625,
+    "close_max": 73067.703125,
+    "volume_mean": 230.86204528808594
   },
   {
     "timestamp": "2026-04-08 15:45:00",
-    "close_mean": 71638.4140625,
-    "close_min": 70447.8359375,
-    "close_max": 72474.875,
-    "volume_mean": 218.94564819335938
+    "close_mean": 71553.8671875,
+    "close_min": 70602.078125,
+    "close_max": 72856.3671875,
+    "volume_mean": 197.99107360839844
   },
   {
     "timestamp": "2026-04-08 16:00:00",
-    "close_mean": 71604.65625,
-    "close_min": 70620.703125,
-    "close_max": 72579.8828125,
-    "volume_mean": 296.24609375
+    "close_mean": 71541.5234375,
+    "close_min": 70479.1796875,
+    "close_max": 73116.9140625,
+    "volume_mean": 241.57505798339844
   },
   {
     "timestamp": "2026-04-08 16:15:00",
-    "close_mean": 71694.1328125,
-    "close_min": 70520.03125,
-    "close_max": 72710.578125,
-    "volume_mean": 192.54566955566406
+    "close_mean": 71545.6484375,
+    "close_min": 70662.1953125,
+    "close_max": 73156.1953125,
+    "volume_mean": 191.37315368652344
   },
   {
     "timestamp": "2026-04-08 16:30:00",
-    "close_mean": 71642.9453125,
-    "close_min": 69964.875,
-    "close_max": 72945.2421875,
-    "volume_mean": 202.5163116455078
+    "close_mean": 71565.4609375,
+    "close_min": 70581.71875,
+    "close_max": 72993.90625,
+    "volume_mean": 191.31869506835938
   },
   {
     "timestamp": "2026-04-08 16:45:00",
-    "close_mean": 71641.546875,
-    "close_min": 70261.5703125,
-    "close_max": 72743.4140625,
-    "volume_mean": 178.1935577392578
+    "close_mean": 71567.90625,
+    "close_min": 70493.6796875,
+    "close_max": 72877.421875,
+    "volume_mean": 161.77699279785156
+  },
+  {
+    "timestamp": "2026-04-08 17:00:00",
+    "close_mean": 71629.109375,
+    "close_min": 70547.796875,
+    "close_max": 72724.9765625,
+    "volume_mean": 196.76528930664062
   }
 ]
