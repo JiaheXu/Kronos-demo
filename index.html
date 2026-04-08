@@ -22,78 +22,78 @@
         <section id="live-dashboard">
             <h2>Live BTC/USDT Forecast Dashboard</h2>
             <div class="metadata">
-                <span>Last Updated (UTC): <strong id="update-time">2026-04-08 07:35:56</strong></span>
-                <span>Data Source: Binance | Interval: 1-Hour</span>
+                <span>Last Updated (UTC): <strong id="update-time">2026-04-08 07:44:09</strong></span>
+                <span>Data Source: Binance | Interval: 15-Minute</span>
             </div>
 
             <div class="model-sections">
                 <article class="model-panel">
                     <div class="model-header">
                         <h3>Kronos-mini</h3>
-                        <p>The compact model forecast using the `Kronos-Tokenizer-2k` tokenizer.</p>
+                        <p>The compact model forecast using the `Kronos-Tokenizer-2k` tokenizer on BTC/USDT 15m candles.</p>
                     </div>
                     <div class="metrics-container">
                         <div class="metric-card">
-                            <h3>Upside Probability (Next 24h)</h3>
-                            <p class="metric-value" id="mini-upside-prob">23.3%</p>
-                            <div class="metric-desc">Probability that the 24-hour terminal price is above the latest close.</div>
+                            <h3>Upside Probability</h3>
+                            <p class="metric-value" id="15m-mini-upside-prob">30.0%</p>
+                            <div class="metric-desc">Probability that the final 15m-horizon forecast point is above the latest close.</div>
                         </div>
                         <div class="metric-card">
                             <h3>Volatility Amplification</h3>
-                            <p class="metric-value" id="mini-vol-amp-prob">3.3%</p>
-                            <div class="metric-desc">Probability that forecast volatility exceeds recent historical volatility.</div>
+                            <p class="metric-value" id="15m-mini-vol-amp-prob">96.7%</p>
+                            <div class="metric-desc">Probability that forecast volatility exceeds recent 15m historical volatility.</div>
                         </div>
                         <div class="metric-card">
-                            <h3>Mean Price at +24h</h3>
-                            <p class="metric-value" id="mini-mean-price">71,007.84</p>
-                            <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the forecast horizon.</div>
+                            <h3>Mean Price at Horizon</h3>
+                            <p class="metric-value" id="15m-mini-mean-price">71,322.68</p>
+                            <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 15m forecast horizon.</div>
                         </div>
                     </div>
                     <div class="chart-wrapper">
-                        <h3>24-Hour Probabilistic Forecast</h3>
+                        <h3>24-Step Probabilistic Forecast</h3>
                         <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                         <div class="chart-container">
-                            <img src="prediction_chart_mini.png" alt="Kronos-mini BTC/USDT forecast chart" class="chart-img">
+                            <img id="15m-mini-chart-img" src="prediction_chart_mini_15m.png" alt="Kronos-mini BTC/USDT 15-minute forecast chart" class="chart-img">
                         </div>
                     </div>
                     <div class="artifact-links">
-                        <a id="mini-csv-link" href="results/mini_forecast.csv" class="btn btn-primary">Download CSV</a>
-                        <a id="mini-json-link" href="results/mini_forecast.json" class="btn btn-secondary">Download JSON</a>
+                        <a id="15m-mini-csv-link" href="results/mini_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
+                        <a id="15m-mini-json-link" href="results/mini_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
                     </div>
                 </article>
 
                 <article class="model-panel">
                     <div class="model-header">
                         <h3>Kronos-base</h3>
-                        <p>The larger model forecast using the `Kronos-Tokenizer-base` tokenizer.</p>
+                        <p>The larger model forecast using the `Kronos-Tokenizer-base` tokenizer on BTC/USDT 15m candles.</p>
                     </div>
                     <div class="metrics-container">
                         <div class="metric-card">
-                            <h3>Upside Probability (Next 24h)</h3>
-                            <p class="metric-value" id="base-upside-prob">0.0%</p>
-                            <div class="metric-desc">Probability that the 24-hour terminal price is above the latest close.</div>
+                            <h3>Upside Probability</h3>
+                            <p class="metric-value" id="15m-base-upside-prob">0.0%</p>
+                            <div class="metric-desc">Probability that the final 15m-horizon forecast point is above the latest close.</div>
                         </div>
                         <div class="metric-card">
                             <h3>Volatility Amplification</h3>
-                            <p class="metric-value" id="base-vol-amp-prob">0.0%</p>
-                            <div class="metric-desc">Probability that forecast volatility exceeds recent historical volatility.</div>
+                            <p class="metric-value" id="15m-base-vol-amp-prob">100.0%</p>
+                            <div class="metric-desc">Probability that forecast volatility exceeds recent 15m historical volatility.</div>
                         </div>
                         <div class="metric-card">
-                            <h3>Mean Price at +24h</h3>
-                            <p class="metric-value" id="base-mean-price">68,866.09</p>
-                            <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the forecast horizon.</div>
+                            <h3>Mean Price at Horizon</h3>
+                            <p class="metric-value" id="15m-base-mean-price">69,993.14</p>
+                            <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 15m forecast horizon.</div>
                         </div>
                     </div>
                     <div class="chart-wrapper">
-                        <h3>24-Hour Probabilistic Forecast</h3>
+                        <h3>24-Step Probabilistic Forecast</h3>
                         <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                         <div class="chart-container">
-                            <img src="prediction_chart_base.png" alt="Kronos-base BTC/USDT forecast chart" class="chart-img">
+                            <img id="15m-base-chart-img" src="prediction_chart_base_15m.png" alt="Kronos-base BTC/USDT 15-minute forecast chart" class="chart-img">
                         </div>
                     </div>
                     <div class="artifact-links">
-                        <a id="base-csv-link" href="results/base_forecast.csv" class="btn btn-primary">Download CSV</a>
-                        <a id="base-json-link" href="results/base_forecast.json" class="btn btn-secondary">Download JSON</a>
+                        <a id="15m-base-csv-link" href="results/base_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
+                        <a id="15m-base-json-link" href="results/base_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
                     </div>
                 </article>
             </div>
@@ -104,10 +104,10 @@
             <h2>Methodology Overview</h2>
             <p>This demo showcases the forecasting results of <strong>Kronos</strong>, a foundation model pre-trained on the "language" of financial markets. The predictions are generated using the following process:</p>
             <ul>
-                <li><strong>Models:</strong> Both `Kronos-mini` and `Kronos-base` are run on the same BTC/USDT hourly context for side-by-side comparison.</li>
-                <li><strong>Data Context:</strong> The model uses the last 360 hours (~15 days) of BTC/USDT 1h K-line data from Binance as context for each new prediction.</li>
+                <li><strong>Models:</strong> Both `Kronos-mini` and `Kronos-base` are run on the same BTC/USDT 15-minute context for side-by-side comparison.</li>
+                <li><strong>Data Context:</strong> The model uses the last 360 BTC/USDT 15m K-line candles from Binance as context for each new prediction.</li>
                 <li><strong>Probabilistic Forecasting:</strong> We employ Monte Carlo sampling (N=30 paths) to generate a distribution of possible future price trajectories, not just a single point forecast.</li>
-                <li><strong>Saved Outputs:</strong> Each model writes its own chart plus CSV and JSON forecast tables to the local `results/` directory.</li>
+                <li><strong>Saved Outputs:</strong> Each model writes its own 15m chart plus CSV and JSON forecast tables to the local `results/` directory.</li>
             </ul>
         </section>
 
