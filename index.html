@@ -22,118 +22,118 @@
         <section id="live-dashboard">
             <h2>Live BTC/USDT And ETH/USDT Forecast Dashboard</h2>
             <div class="metadata">
-                <span>Last Updated (Beijing Time): <strong id="update-time">2026-04-09 07:30:43</strong></span>
-                <span>Data Source: Binance | Interval: 15-Minute</span>
+                <span>Last Updated (Beijing Time): <strong id="update-time">2026-06-27 17:03:58</strong></span>
+                <span>Data Source: Binance | Interval: 1-Minute</span>
             </div>
 
             <div class="symbol-group">
                 <div class="symbol-heading">
                     <h3>BTC/USDT</h3>
-                    <p>Three Kronos models running on BTC/USDT 15m Binance candles.</p>
+                    <p>Three Kronos models running on BTC/USDT 1m Binance candles.</p>
                 </div>
                 <div class="model-sections">
                     <article class="model-panel">
                         <div class="model-header">
                             <h3>Kronos-mini</h3>
-                            <p>The compact model forecast using the `Kronos-Tokenizer-2k` tokenizer on BTC/USDT 15m candles.</p>
+                            <p>The compact model forecast using the `Kronos-Tokenizer-2k` tokenizer on BTC/USDT 1m candles.</p>
                         </div>
                         <div class="chart-wrapper">
                             <h3>24-Step Probabilistic Forecast</h3>
                             <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                             <div class="chart-container">
-                                <img id="btc-15m-mini-chart-img" src="prediction_chart_btc_mini_15m.png" alt="Kronos-mini BTC/USDT 15-minute forecast chart" class="chart-img">
+                                <img id="btc-1m-mini-chart-img" src="prediction_chart_btc_mini_1m.png" alt="Kronos-mini BTC/USDT 1-minute forecast chart" class="chart-img">
                             </div>
                         </div>
                         <div class="metrics-container">
                             <div class="metric-card">
                                 <h3>Upside Probability</h3>
-                                <p class="metric-value" id="btc-15m-mini-upside-prob">68.0%</p>
-                                <div class="metric-desc">Probability that the final BTC 15m-horizon forecast point is above the latest close.</div>
+                                <p class="metric-value" id="btc-1m-mini-upside-prob">68.0%</p>
+                                <div class="metric-desc">Probability that the final BTC 1m-horizon forecast point is above the latest close.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Volatility Amplification</h3>
-                                <p class="metric-value" id="btc-15m-mini-vol-amp-prob">54.0%</p>
-                                <div class="metric-desc">Probability that BTC forecast volatility exceeds recent 15m historical volatility.</div>
+                                <p class="metric-value" id="btc-1m-mini-vol-amp-prob">54.0%</p>
+                                <div class="metric-desc">Probability that BTC forecast volatility exceeds recent 1m historical volatility.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Mean Price at Horizon</h3>
-                                <p class="metric-value" id="btc-15m-mini-mean-price">71,171.63</p>
-                                <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 15m forecast horizon.</div>
+                                <p class="metric-value" id="btc-1m-mini-mean-price">71,171.63</p>
+                                <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 1m forecast horizon.</div>
                             </div>
                         </div>
                         <div class="artifact-links">
-                            <a id="btc-15m-mini-csv-link" href="results/btc_mini_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
-                            <a id="btc-15m-mini-json-link" href="results/btc_mini_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
+                            <a id="btc-1m-mini-csv-link" href="results/btc_mini_forecast_1m.csv" class="btn btn-primary">Download CSV</a>
+                            <a id="btc-1m-mini-json-link" href="results/btc_mini_forecast_1m.json" class="btn btn-secondary">Download JSON</a>
                         </div>
                     </article>
 
                     <article class="model-panel">
                         <div class="model-header">
                             <h3>Kronos-small</h3>
-                            <p>The mid-sized model forecast using the `Kronos-Tokenizer-base` tokenizer on BTC/USDT 15m candles.</p>
+                            <p>The mid-sized model forecast using the `Kronos-Tokenizer-base` tokenizer on BTC/USDT 1m candles.</p>
                         </div>
                         <div class="chart-wrapper">
                             <h3>24-Step Probabilistic Forecast</h3>
                             <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                             <div class="chart-container">
-                                <img id="btc-15m-small-chart-img" src="prediction_chart_btc_small_15m.png" alt="Kronos-small BTC/USDT 15-minute forecast chart" class="chart-img">
+                                <img id="btc-1m-small-chart-img" src="prediction_chart_btc_small_1m.png" alt="Kronos-small BTC/USDT 1-minute forecast chart" class="chart-img">
                             </div>
                         </div>
                         <div class="metrics-container">
                             <div class="metric-card">
                                 <h3>Upside Probability</h3>
-                                <p class="metric-value" id="btc-15m-small-upside-prob">54.0%</p>
-                                <div class="metric-desc">Probability that the final BTC 15m-horizon forecast point is above the latest close.</div>
+                                <p class="metric-value" id="btc-1m-small-upside-prob">54.0%</p>
+                                <div class="metric-desc">Probability that the final BTC 1m-horizon forecast point is above the latest close.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Volatility Amplification</h3>
-                                <p class="metric-value" id="btc-15m-small-vol-amp-prob">44.0%</p>
-                                <div class="metric-desc">Probability that BTC forecast volatility exceeds recent 15m historical volatility.</div>
+                                <p class="metric-value" id="btc-1m-small-vol-amp-prob">44.0%</p>
+                                <div class="metric-desc">Probability that BTC forecast volatility exceeds recent 1m historical volatility.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Mean Price at Horizon</h3>
-                                <p class="metric-value" id="btc-15m-small-mean-price">70,964.88</p>
-                                <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 15m forecast horizon.</div>
+                                <p class="metric-value" id="btc-1m-small-mean-price">70,964.88</p>
+                                <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 1m forecast horizon.</div>
                             </div>
                         </div>
                         <div class="artifact-links">
-                            <a id="btc-15m-small-csv-link" href="results/btc_small_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
-                            <a id="btc-15m-small-json-link" href="results/btc_small_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
+                            <a id="btc-1m-small-csv-link" href="results/btc_small_forecast_1m.csv" class="btn btn-primary">Download CSV</a>
+                            <a id="btc-1m-small-json-link" href="results/btc_small_forecast_1m.json" class="btn btn-secondary">Download JSON</a>
                         </div>
                     </article>
 
                     <article class="model-panel">
                         <div class="model-header">
                             <h3>Kronos-base</h3>
-                            <p>The larger model forecast using the `Kronos-Tokenizer-base` tokenizer on BTC/USDT 15m candles.</p>
+                            <p>The larger model forecast using the `Kronos-Tokenizer-base` tokenizer on BTC/USDT 1m candles.</p>
                         </div>
                         <div class="chart-wrapper">
                             <h3>24-Step Probabilistic Forecast</h3>
                             <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                             <div class="chart-container">
-                                <img id="btc-15m-base-chart-img" src="prediction_chart_btc_base_15m.png" alt="Kronos-base BTC/USDT 15-minute forecast chart" class="chart-img">
+                                <img id="btc-1m-base-chart-img" src="prediction_chart_btc_base_1m.png" alt="Kronos-base BTC/USDT 1-minute forecast chart" class="chart-img">
                             </div>
                         </div>
                         <div class="metrics-container">
                             <div class="metric-card">
                                 <h3>Upside Probability</h3>
-                                <p class="metric-value" id="btc-15m-base-upside-prob">36.0%</p>
-                                <div class="metric-desc">Probability that the final BTC 15m-horizon forecast point is above the latest close.</div>
+                                <p class="metric-value" id="btc-1m-base-upside-prob">20.0%</p>
+                                <div class="metric-desc">Probability that the final BTC 1m-horizon forecast point is above the latest close.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Volatility Amplification</h3>
-                                <p class="metric-value" id="btc-15m-base-vol-amp-prob">30.0%</p>
-                                <div class="metric-desc">Probability that BTC forecast volatility exceeds recent 15m historical volatility.</div>
+                                <p class="metric-value" id="btc-1m-base-vol-amp-prob">2.0%</p>
+                                <div class="metric-desc">Probability that BTC forecast volatility exceeds recent 1m historical volatility.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Mean Price at Horizon</h3>
-                                <p class="metric-value" id="btc-15m-base-mean-price">70,803.16</p>
-                                <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 15m forecast horizon.</div>
+                                <p class="metric-value" id="btc-1m-base-mean-price">60,389.04</p>
+                                <div class="metric-desc">Mean predicted BTC/USDT close price at the end of the 1m forecast horizon.</div>
                             </div>
                         </div>
                         <div class="artifact-links">
-                            <a id="btc-15m-base-csv-link" href="results/btc_base_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
-                            <a id="btc-15m-base-json-link" href="results/btc_base_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
+                            <a id="btc-1m-base-csv-link" href="results/btc_base_forecast_1m.csv" class="btn btn-primary">Download CSV</a>
+                            <a id="btc-1m-base-json-link" href="results/btc_base_forecast_1m.json" class="btn btn-secondary">Download JSON</a>
                         </div>
                     </article>
                 </div>
@@ -142,111 +142,111 @@
             <div class="symbol-group">
                 <div class="symbol-heading">
                     <h3>ETH/USDT</h3>
-                    <p>Three Kronos models running on ETH/USDT 15m Binance candles.</p>
+                    <p>Three Kronos models running on ETH/USDT 1m Binance candles.</p>
                 </div>
                 <div class="model-sections">
                     <article class="model-panel">
                         <div class="model-header">
                             <h3>Kronos-mini</h3>
-                            <p>The compact model forecast using the `Kronos-Tokenizer-2k` tokenizer on ETH/USDT 15m candles.</p>
+                            <p>The compact model forecast using the `Kronos-Tokenizer-2k` tokenizer on ETH/USDT 1m candles.</p>
                         </div>
                         <div class="chart-wrapper">
                             <h3>24-Step Probabilistic Forecast</h3>
                             <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                             <div class="chart-container">
-                                <img id="eth-15m-mini-chart-img" src="prediction_chart_eth_mini_15m.png" alt="Kronos-mini ETH/USDT 15-minute forecast chart" class="chart-img">
+                                <img id="eth-1m-mini-chart-img" src="prediction_chart_eth_mini_1m.png" alt="Kronos-mini ETH/USDT 1-minute forecast chart" class="chart-img">
                             </div>
                         </div>
                         <div class="metrics-container">
                             <div class="metric-card">
                                 <h3>Upside Probability</h3>
-                                <p class="metric-value" id="eth-15m-mini-upside-prob">82.0%</p>
-                                <div class="metric-desc">Probability that the final ETH 15m-horizon forecast point is above the latest close.</div>
+                                <p class="metric-value" id="eth-1m-mini-upside-prob">82.0%</p>
+                                <div class="metric-desc">Probability that the final ETH 1m-horizon forecast point is above the latest close.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Volatility Amplification</h3>
-                                <p class="metric-value" id="eth-15m-mini-vol-amp-prob">70.0%</p>
-                                <div class="metric-desc">Probability that ETH forecast volatility exceeds recent 15m historical volatility.</div>
+                                <p class="metric-value" id="eth-1m-mini-vol-amp-prob">70.0%</p>
+                                <div class="metric-desc">Probability that ETH forecast volatility exceeds recent 1m historical volatility.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Mean Price at Horizon</h3>
-                                <p class="metric-value" id="eth-15m-mini-mean-price">2,206.14</p>
-                                <div class="metric-desc">Mean predicted ETH/USDT close price at the end of the 15m forecast horizon.</div>
+                                <p class="metric-value" id="eth-1m-mini-mean-price">2,206.14</p>
+                                <div class="metric-desc">Mean predicted ETH/USDT close price at the end of the 1m forecast horizon.</div>
                             </div>
                         </div>
                         <div class="artifact-links">
-                            <a id="eth-15m-mini-csv-link" href="results/eth_mini_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
-                            <a id="eth-15m-mini-json-link" href="results/eth_mini_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
+                            <a id="eth-1m-mini-csv-link" href="results/eth_mini_forecast_1m.csv" class="btn btn-primary">Download CSV</a>
+                            <a id="eth-1m-mini-json-link" href="results/eth_mini_forecast_1m.json" class="btn btn-secondary">Download JSON</a>
                         </div>
                     </article>
 
                     <article class="model-panel">
                         <div class="model-header">
                             <h3>Kronos-small</h3>
-                            <p>The mid-sized model forecast using the `Kronos-Tokenizer-base` tokenizer on ETH/USDT 15m candles.</p>
+                            <p>The mid-sized model forecast using the `Kronos-Tokenizer-base` tokenizer on ETH/USDT 1m candles.</p>
                         </div>
                         <div class="chart-wrapper">
                             <h3>24-Step Probabilistic Forecast</h3>
                             <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                             <div class="chart-container">
-                                <img id="eth-15m-small-chart-img" src="prediction_chart_eth_small_15m.png" alt="Kronos-small ETH/USDT 15-minute forecast chart" class="chart-img">
+                                <img id="eth-1m-small-chart-img" src="prediction_chart_eth_small_1m.png" alt="Kronos-small ETH/USDT 1-minute forecast chart" class="chart-img">
                             </div>
                         </div>
                         <div class="metrics-container">
                             <div class="metric-card">
                                 <h3>Upside Probability</h3>
-                                <p class="metric-value" id="eth-15m-small-upside-prob">44.0%</p>
-                                <div class="metric-desc">Probability that the final ETH 15m-horizon forecast point is above the latest close.</div>
+                                <p class="metric-value" id="eth-1m-small-upside-prob">44.0%</p>
+                                <div class="metric-desc">Probability that the final ETH 1m-horizon forecast point is above the latest close.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Volatility Amplification</h3>
-                                <p class="metric-value" id="eth-15m-small-vol-amp-prob">22.0%</p>
-                                <div class="metric-desc">Probability that ETH forecast volatility exceeds recent 15m historical volatility.</div>
+                                <p class="metric-value" id="eth-1m-small-vol-amp-prob">22.0%</p>
+                                <div class="metric-desc">Probability that ETH forecast volatility exceeds recent 1m historical volatility.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Mean Price at Horizon</h3>
-                                <p class="metric-value" id="eth-15m-small-mean-price">2,187.50</p>
-                                <div class="metric-desc">Mean predicted ETH/USDT close price at the end of the 15m forecast horizon.</div>
+                                <p class="metric-value" id="eth-1m-small-mean-price">2,187.50</p>
+                                <div class="metric-desc">Mean predicted ETH/USDT close price at the end of the 1m forecast horizon.</div>
                             </div>
                         </div>
                         <div class="artifact-links">
-                            <a id="eth-15m-small-csv-link" href="results/eth_small_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
-                            <a id="eth-15m-small-json-link" href="results/eth_small_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
+                            <a id="eth-1m-small-csv-link" href="results/eth_small_forecast_1m.csv" class="btn btn-primary">Download CSV</a>
+                            <a id="eth-1m-small-json-link" href="results/eth_small_forecast_1m.json" class="btn btn-secondary">Download JSON</a>
                         </div>
                     </article>
 
                     <article class="model-panel">
                         <div class="model-header">
                             <h3>Kronos-base</h3>
-                            <p>The larger model forecast using the `Kronos-Tokenizer-base` tokenizer on ETH/USDT 15m candles.</p>
+                            <p>The larger model forecast using the `Kronos-Tokenizer-base` tokenizer on ETH/USDT 1m candles.</p>
                         </div>
                         <div class="chart-wrapper">
                             <h3>24-Step Probabilistic Forecast</h3>
                             <p>The chart shows historical price and volume with the model's forecast range and mean path.</p>
                             <div class="chart-container">
-                                <img id="eth-15m-base-chart-img" src="prediction_chart_eth_base_15m.png" alt="Kronos-base ETH/USDT 15-minute forecast chart" class="chart-img">
+                                <img id="eth-1m-base-chart-img" src="prediction_chart_eth_base_1m.png" alt="Kronos-base ETH/USDT 1-minute forecast chart" class="chart-img">
                             </div>
                         </div>
                         <div class="metrics-container">
                             <div class="metric-card">
                                 <h3>Upside Probability</h3>
-                                <p class="metric-value" id="eth-15m-base-upside-prob">64.0%</p>
-                                <div class="metric-desc">Probability that the final ETH 15m-horizon forecast point is above the latest close.</div>
+                                <p class="metric-value" id="eth-1m-base-upside-prob">64.0%</p>
+                                <div class="metric-desc">Probability that the final ETH 1m-horizon forecast point is above the latest close.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Volatility Amplification</h3>
-                                <p class="metric-value" id="eth-15m-base-vol-amp-prob">18.0%</p>
-                                <div class="metric-desc">Probability that ETH forecast volatility exceeds recent 15m historical volatility.</div>
+                                <p class="metric-value" id="eth-1m-base-vol-amp-prob">18.0%</p>
+                                <div class="metric-desc">Probability that ETH forecast volatility exceeds recent 1m historical volatility.</div>
                             </div>
                             <div class="metric-card">
                                 <h3>Mean Price at Horizon</h3>
-                                <p class="metric-value" id="eth-15m-base-mean-price">2,189.92</p>
-                                <div class="metric-desc">Mean predicted ETH/USDT close price at the end of the 15m forecast horizon.</div>
+                                <p class="metric-value" id="eth-1m-base-mean-price">2,189.92</p>
+                                <div class="metric-desc">Mean predicted ETH/USDT close price at the end of the 1m forecast horizon.</div>
                             </div>
                         </div>
                         <div class="artifact-links">
-                            <a id="eth-15m-base-csv-link" href="results/eth_base_forecast_15m.csv" class="btn btn-primary">Download CSV</a>
-                            <a id="eth-15m-base-json-link" href="results/eth_base_forecast_15m.json" class="btn btn-secondary">Download JSON</a>
+                            <a id="eth-1m-base-csv-link" href="results/eth_base_forecast_1m.csv" class="btn btn-primary">Download CSV</a>
+                            <a id="eth-1m-base-json-link" href="results/eth_base_forecast_1m.json" class="btn btn-secondary">Download JSON</a>
                         </div>
                     </article>
                 </div>
@@ -258,10 +258,10 @@
             <h2>Methodology Overview</h2>
             <p>This demo showcases the forecasting results of <strong>Kronos</strong>, a foundation model pre-trained on the "language" of financial markets. The predictions are generated using the following process:</p>
             <ul>
-                <li><strong>Models:</strong> `Kronos-mini`, `Kronos-small`, and `Kronos-base` are run for both BTC/USDT and ETH/USDT on the same 15-minute interval for side-by-side comparison.</li>
-                <li><strong>Data Context:</strong> The model uses the last 360 Binance 15m K-line candles for each symbol independently.</li>
+                <li><strong>Models:</strong> `Kronos-mini`, `Kronos-small`, and `Kronos-base` are run for both BTC/USDT and ETH/USDT on the same 1-minute interval for side-by-side comparison.</li>
+                <li><strong>Data Context:</strong> The model uses the last 360 Binance 1m K-line candles for each symbol independently.</li>
                 <li><strong>Probabilistic Forecasting:</strong> We employ Monte Carlo sampling (N=30 paths) to generate a distribution of possible future price trajectories, not just a single point forecast.</li>
-                <li><strong>Saved Outputs:</strong> Each symbol/model pair writes its own 15m chart plus CSV and JSON forecast tables to the local `results/` directory.</li>
+                <li><strong>Saved Outputs:</strong> Each symbol/model pair writes its own 1m chart plus CSV and JSON forecast tables to the local `results/` directory.</li>
             </ul>
         </section>
 
