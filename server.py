@@ -23,20 +23,48 @@ Config = {
     "REPO_PATH": Path(__file__).parent.resolve(),
     "MODEL_PATH": "../Kronos_model",
     "OUTPUT_PATH": Path(__file__).parent.resolve() / "results",
-    "SYMBOL": 'BTCUSDT',
-    "INTERVAL": '1h',
-    "HIST_POINTS": 360,
-    "PRED_HORIZON": 24,
-    "N_PREDICTIONS": 30,
-    "VOL_WINDOW": 24,
+    "N_PREDICTIONS": 50,
     "SERVER_HOST": "0.0.0.0",
     "SERVER_PORT": 8000,
+    "SYMBOLS": [
+        {
+            "key": "btc",
+            "symbol": "BTCUSDT",
+            "label": "BTC/USDT",
+        },
+        {
+            "key": "eth",
+            "symbol": "ETHUSDT",
+            "label": "ETH/USDT",
+        },
+    ],
+    "TIMEFRAMES": [
+        {
+            "key": "15m",
+            "interval": "15m",
+            "label": "15-Minute",
+            "hist_points": 360,
+            "pred_horizon": 24,
+            "vol_window": 24,
+            "step": pd.Timedelta(minutes=15),
+            "freq": "15min",
+            "schedule_minutes": 15,
+            "artifact_suffix": "_15m",
+            "dashboard_enabled": True,
+        },
+    ],
     "MODELS": [
         {
             "key": "mini",
             "label": "Kronos-mini",
             "tokenizer_id": "NeoQuasar/Kronos-Tokenizer-2k",
             "model_id": "NeoQuasar/Kronos-mini",
+        },
+        {
+            "key": "small",
+            "label": "Kronos-small",
+            "tokenizer_id": "NeoQuasar/Kronos-Tokenizer-base",
+            "model_id": "NeoQuasar/Kronos-small",
         },
         {
             "key": "base",
@@ -46,6 +74,19 @@ Config = {
         },
     ],
 }
+
+
+def artifact_name(prefix, symbol_key, model_key, timeframe_config, extension):
+    """Builds a stable artifact filename per symbol/model/timeframe."""
+    suffix = timeframe_config["artifact_suffix"]
+    if prefix == "forecast":
+        return f"{symbol_key}_{model_key}_forecast{suffix}.{extension}"
+    return f"{prefix}_{symbol_key}_{model_key}{suffix}.{extension}"
+
+
+def dashboard_metric_id(symbol_key, timeframe_key, model_key, metric_key):
+    """Builds a unique DOM id for a symbol/timeframe/model metric."""
+    return f"{symbol_key}-{timeframe_key}-{model_key}-{metric_key}"
 
 
 def load_models():
@@ -71,14 +112,14 @@ def load_models():
     return predictors
 
 
-def make_prediction(df, predictor):
+def make_prediction(df, predictor, timeframe_config):
     """Generates probabilistic forecasts using the Kronos model."""
     last_timestamp = df['timestamps'].max()
-    start_new_range = last_timestamp + pd.Timedelta(hours=1)
+    start_new_range = last_timestamp + timeframe_config["step"]
     new_timestamps_index = pd.date_range(
         start=start_new_range,
-        periods=Config["PRED_HORIZON"],
-        freq='H'
+        periods=timeframe_config["pred_horizon"],
+        freq=timeframe_config["freq"]
     )
     y_timestamp = pd.Series(new_timestamps_index, name='y_timestamp')
     x_timestamp = df['timestamps']
@@ -89,7 +130,7 @@ def make_prediction(df, predictor):
         begin_time = time.time()
         close_preds_main, volume_preds_main = predictor.predict(
             df=x_df, x_timestamp=x_timestamp, y_timestamp=y_timestamp,
-            pred_len=Config["PRED_HORIZON"], T=1.0, top_p=0.95,
+            pred_len=timeframe_config["pred_horizon"], T=1.0, top_p=0.95,
             sample_count=Config["N_PREDICTIONS"], verbose=True
         )
         print(f"Main prediction completed in {time.time() - begin_time:.2f} seconds.")
@@ -107,10 +148,10 @@ def make_prediction(df, predictor):
     return close_preds_main, volume_preds_main, close_preds_volatility
 
 
-def fetch_binance_data():
+def fetch_binance_data(symbol_config, timeframe_config):
     """Fetches K-line data from the Binance public API."""
-    symbol, interval = Config["SYMBOL"], Config["INTERVAL"]
-    limit = Config["HIST_POINTS"] + Config["VOL_WINDOW"]
+    symbol, interval = symbol_config["symbol"], timeframe_config["interval"]
+    limit = timeframe_config["hist_points"] + timeframe_config["vol_window"]
 
     print(f"Fetching {limit} bars of {symbol} {interval} data from Binance...")
     client = Client()
@@ -132,7 +173,7 @@ def fetch_binance_data():
     return df
 
 
-def calculate_metrics(hist_df, close_preds_df, v_close_preds_df):
+def calculate_metrics(hist_df, close_preds_df, v_close_preds_df, timeframe_config):
     """
     Calculates upside and volatility amplification probabilities for the 24h horizon.
     """
@@ -145,7 +186,7 @@ def calculate_metrics(hist_df, close_preds_df, v_close_preds_df):
 
     # 2. Volatility Amplification Probability (over the 24-hour horizon)
     hist_log_returns = np.log(hist_df['close'] / hist_df['close'].shift(1))
-    historical_vol = hist_log_returns.iloc[-Config["VOL_WINDOW"]:].std()
+    historical_vol = hist_log_returns.iloc[-timeframe_config["vol_window"]:].std()
 
     amplification_count = 0
     for col in v_close_preds_df.columns:
@@ -157,13 +198,20 @@ def calculate_metrics(hist_df, close_preds_df, v_close_preds_df):
 
     vol_amp_prob = amplification_count / len(v_close_preds_df.columns)
 
-    print(f"Upside Probability (24h): {upside_prob:.2%}, Volatility Amplification Probability: {vol_amp_prob:.2%}")
+    print(
+        f"Upside Probability ({timeframe_config['label']}): {upside_prob:.2%}, "
+        f"Volatility Amplification Probability: {vol_amp_prob:.2%}"
+    )
     return upside_prob, vol_amp_prob
 
 
-def create_plot(hist_df, close_preds_df, volume_preds_df, model_config):
+def create_plot(hist_df, close_preds_df, volume_preds_df, model_config, symbol_config, timeframe_config):
     """Generates and saves a comprehensive forecast chart."""
-    print(f"Generating comprehensive forecast chart for {model_config['label']}...")
+    model_type = model_config["key"]
+    print(
+        f"Generating comprehensive forecast chart for "
+        f"{symbol_config['label']} {model_type} ({timeframe_config['label']})..."
+    )
     # plt.style.use('seaborn-v0_8-whitegrid')
     fig, (ax1, ax2) = plt.subplots(
         2, 1, figsize=(15, 10), sharex=True,
@@ -172,14 +220,17 @@ def create_plot(hist_df, close_preds_df, volume_preds_df, model_config):
 
     hist_time = hist_df['timestamps']
     last_hist_time = hist_time.iloc[-1]
-    pred_time = pd.to_datetime([last_hist_time + timedelta(hours=i + 1) for i in range(len(close_preds_df))])
+    pred_time = pd.to_datetime(
+        [last_hist_time + timeframe_config["step"] * (i + 1) for i in range(len(close_preds_df))]
+    )
 
     ax1.plot(hist_time, hist_df['close'], color='royalblue', label='Historical Price', linewidth=1.5)
     mean_preds = close_preds_df.mean(axis=1)
     ax1.plot(pred_time, mean_preds, color='darkorange', linestyle='-', label='Mean Forecast')
     ax1.fill_between(pred_time, close_preds_df.min(axis=1), close_preds_df.max(axis=1), color='darkorange', alpha=0.2, label='Forecast Range (Min-Max)')
     ax1.set_title(
-        f'{Config["SYMBOL"]} {model_config["label"]} Forecast (Next {Config["PRED_HORIZON"]} Hours)',
+        f'{symbol_config["label"]} {model_type} Forecast '
+        f'({timeframe_config["label"]}, Next {timeframe_config["pred_horizon"]} Steps)',
         fontsize=16,
         weight='bold'
     )
@@ -194,30 +245,39 @@ def create_plot(hist_df, close_preds_df, volume_preds_df, model_config):
     ax2.legend()
     ax2.grid(True, which='both', linestyle='--', linewidth=0.5)
 
-    separator_time = hist_time.iloc[-1] + timedelta(minutes=30)
+    separator_time = hist_time.iloc[-1] + (timeframe_config["step"] / 2)
     for ax in [ax1, ax2]:
         ax.axvline(x=separator_time, color='red', linestyle='--', linewidth=1.5, label='_nolegend_')
         ax.tick_params(axis='x', rotation=30)
 
     fig.tight_layout()
-    chart_path = Config["REPO_PATH"] / f'prediction_chart_{model_config["key"]}.png'
+    chart_path = Config["REPO_PATH"] / artifact_name(
+        "prediction_chart",
+        symbol_config["key"],
+        model_config["key"],
+        timeframe_config,
+        "png",
+    )
     fig.savefig(chart_path, dpi=120)
     plt.close(fig)
     print(f"Chart saved to: {chart_path}")
     return chart_path
 
 
-def save_prediction_results(df_for_model, close_preds_df, volume_preds_df, model_config):
+def save_prediction_results(df_for_model, close_preds_df, volume_preds_df, model_config, symbol_config, timeframe_config):
     """Saves forecast outputs locally for later inspection."""
-    print(f"Saving forecast outputs for {model_config['label']}...")
+    print(
+        f"Saving forecast outputs for "
+        f"{symbol_config['label']} {model_config['label']} ({timeframe_config['label']})..."
+    )
     output_dir = Config["OUTPUT_PATH"]
     output_dir.mkdir(parents=True, exist_ok=True)
 
     last_timestamp = df_for_model['timestamps'].max()
     pred_time = pd.date_range(
-        start=last_timestamp + pd.Timedelta(hours=1),
-        periods=Config["PRED_HORIZON"],
-        freq='H'
+        start=last_timestamp + timeframe_config["step"],
+        periods=timeframe_config["pred_horizon"],
+        freq=timeframe_config["freq"]
     )
 
     result_df = pd.DataFrame({
@@ -228,8 +288,12 @@ def save_prediction_results(df_for_model, close_preds_df, volume_preds_df, model
         'volume_mean': volume_preds_df.mean(axis=1).to_numpy(),
     })
 
-    csv_path = output_dir / f'{model_config["key"]}_forecast.csv'
-    json_path = output_dir / f'{model_config["key"]}_forecast.json'
+    csv_path = output_dir / artifact_name(
+        "forecast", symbol_config["key"], model_config["key"], timeframe_config, "csv"
+    )
+    json_path = output_dir / artifact_name(
+        "forecast", symbol_config["key"], model_config["key"], timeframe_config, "json"
+    )
 
     result_df.to_csv(csv_path, index=False)
     with open(json_path, 'w', encoding='utf-8') as f:
@@ -240,47 +304,62 @@ def save_prediction_results(df_for_model, close_preds_df, volume_preds_df, model
     return csv_path, json_path
 
 
-def update_html(model_results):
-    """Updates the dashboard with the latest per-model metrics and artifact paths."""
+def update_html(all_results):
+    """Updates the dashboard with the latest metrics and artifact paths."""
     print("Updating index.html...")
     html_path = Config["REPO_PATH"] / 'index.html'
-    now_utc_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+    beijing_tz = timezone(timedelta(hours=8))
+    now_beijing_str = datetime.now(beijing_tz).strftime('%Y-%m-%d %H:%M:%S')
 
     with open(html_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
     content = re.sub(
         r'(<strong id="update-time">).*?(</strong>)',
-        lambda m: f'{m.group(1)}{now_utc_str}{m.group(2)}',
+        lambda m: f'{m.group(1)}{now_beijing_str}{m.group(2)}',
         content
     )
 
-    for model_key, result in model_results.items():
-        content = re.sub(
-            rf'(<p class="metric-value" id="{model_key}-upside-prob">).*?(</p>)',
-            lambda m, value=f'{result["upside_prob"]:.1%}': f'{m.group(1)}{value}{m.group(2)}',
-            content
-        )
-        content = re.sub(
-            rf'(<p class="metric-value" id="{model_key}-vol-amp-prob">).*?(</p>)',
-            lambda m, value=f'{result["vol_amp_prob"]:.1%}': f'{m.group(1)}{value}{m.group(2)}',
-            content
-        )
-        content = re.sub(
-            rf'(<p class="metric-value" id="{model_key}-mean-price">).*?(</p>)',
-            lambda m, value=f'{result["final_mean_close"]:,.2f}': f'{m.group(1)}{value}{m.group(2)}',
-            content
-        )
-        content = re.sub(
-            rf'(<a id="{model_key}-csv-link" href=").*?(")',
-            lambda m, value=result["csv_href"]: f'{m.group(1)}{value}{m.group(2)}',
-            content
-        )
-        content = re.sub(
-            rf'(<a id="{model_key}-json-link" href=").*?(")',
-            lambda m, value=result["json_href"]: f'{m.group(1)}{value}{m.group(2)}',
-            content
-        )
+    for symbol_key, timeframe_results in all_results.items():
+        for timeframe_key, model_results in timeframe_results.items():
+            for model_key, result in model_results.items():
+                upside_id = dashboard_metric_id(symbol_key, timeframe_key, model_key, "upside-prob")
+                vol_id = dashboard_metric_id(symbol_key, timeframe_key, model_key, "vol-amp-prob")
+                mean_id = dashboard_metric_id(symbol_key, timeframe_key, model_key, "mean-price")
+                csv_id = dashboard_metric_id(symbol_key, timeframe_key, model_key, "csv-link")
+                json_id = dashboard_metric_id(symbol_key, timeframe_key, model_key, "json-link")
+                chart_id = dashboard_metric_id(symbol_key, timeframe_key, model_key, "chart-img")
+
+                content = re.sub(
+                    rf'(<p class="metric-value" id="{upside_id}">).*?(</p>)',
+                    lambda m, value=f'{result["upside_prob"]:.1%}': f'{m.group(1)}{value}{m.group(2)}',
+                    content
+                )
+                content = re.sub(
+                    rf'(<p class="metric-value" id="{vol_id}">).*?(</p>)',
+                    lambda m, value=f'{result["vol_amp_prob"]:.1%}': f'{m.group(1)}{value}{m.group(2)}',
+                    content
+                )
+                content = re.sub(
+                    rf'(<p class="metric-value" id="{mean_id}">).*?(</p>)',
+                    lambda m, value=f'{result["final_mean_close"]:,.2f}': f'{m.group(1)}{value}{m.group(2)}',
+                    content
+                )
+                content = re.sub(
+                    rf'(<a id="{csv_id}" href=").*?(")',
+                    lambda m, value=result["csv_href"]: f'{m.group(1)}{value}{m.group(2)}',
+                    content
+                )
+                content = re.sub(
+                    rf'(<a id="{json_id}" href=").*?(")',
+                    lambda m, value=result["json_href"]: f'{m.group(1)}{value}{m.group(2)}',
+                    content
+                )
+                content = re.sub(
+                    rf'(<img id="{chart_id}" src=").*?(")',
+                    lambda m, value=result["chart_href"]: f'{m.group(1)}{value}{m.group(2)}',
+                    content
+                )
 
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -292,15 +371,21 @@ def git_commit_and_push(commit_message):
     print("Performing Git operations...")
     try:
         os.chdir(Config["REPO_PATH"])
-        add_targets = [
-            'prediction_chart_mini.png',
-            'prediction_chart_base.png',
-            'index.html',
-            'results/mini_forecast.csv',
-            'results/mini_forecast.json',
-            'results/base_forecast.csv',
-            'results/base_forecast.json',
-        ]
+        add_targets = ['index.html']
+        for symbol_config in Config["SYMBOLS"]:
+            for timeframe_config in Config["TIMEFRAMES"]:
+                for model_config in Config["MODELS"]:
+                    add_targets.extend([
+                        artifact_name(
+                            "prediction_chart",
+                            symbol_config["key"],
+                            model_config["key"],
+                            timeframe_config,
+                            "png",
+                        ),
+                        f'results/{artifact_name("forecast", symbol_config["key"], model_config["key"], timeframe_config, "csv")}',
+                        f'results/{artifact_name("forecast", symbol_config["key"], model_config["key"], timeframe_config, "json")}',
+                    ])
         subprocess.run(['git', 'add', *add_targets], check=True, capture_output=True, text=True)
         commit_result = subprocess.run(['git', 'commit', '-m', commit_message], check=True, capture_output=True, text=True)
         print(commit_result.stdout)
@@ -340,28 +425,35 @@ def start_http_server():
     return server
 
 
-def main_task(models):
-    """Executes one full update cycle."""
-    print("\n" + "=" * 60 + f"\nStarting update task at {datetime.now(timezone.utc)}\n" + "=" * 60)
-    df_full = fetch_binance_data()
+def run_symbol_timeframe_task(models, symbol_config, timeframe_config):
+    """Executes one full update cycle for a single symbol and timeframe."""
+    print(f"\nRunning {symbol_config['label']} {timeframe_config['label']} forecast cycle...")
+    df_full = fetch_binance_data(symbol_config, timeframe_config)
     df_for_model = df_full.iloc[:-1]
-    hist_df_for_plot = df_for_model.tail(Config["HIST_POINTS"])
-    hist_df_for_metrics = df_for_model.tail(Config["VOL_WINDOW"])
+    hist_df_for_plot = df_for_model.tail(timeframe_config["hist_points"])
+    hist_df_for_metrics = df_for_model.tail(timeframe_config["vol_window"])
     model_results = {}
 
     for model_key, model_bundle in models.items():
         model_config = model_bundle["config"]
         predictor = model_bundle["predictor"]
 
-        close_preds, volume_preds, v_close_preds = make_prediction(df_for_model, predictor)
-        upside_prob, vol_amp_prob = calculate_metrics(hist_df_for_metrics, close_preds, v_close_preds)
-        create_plot(hist_df_for_plot, close_preds, volume_preds, model_config)
-        csv_path, json_path = save_prediction_results(df_for_model, close_preds, volume_preds, model_config)
+        close_preds, volume_preds, v_close_preds = make_prediction(df_for_model, predictor, timeframe_config)
+        upside_prob, vol_amp_prob = calculate_metrics(
+            hist_df_for_metrics, close_preds, v_close_preds, timeframe_config
+        )
+        chart_path = create_plot(
+            hist_df_for_plot, close_preds, volume_preds, model_config, symbol_config, timeframe_config
+        )
+        csv_path, json_path = save_prediction_results(
+            df_for_model, close_preds, volume_preds, model_config, symbol_config, timeframe_config
+        )
 
         model_results[model_key] = {
             "upside_prob": upside_prob,
             "vol_amp_prob": vol_amp_prob,
             "final_mean_close": float(close_preds.mean(axis=1).iloc[-1]),
+            "chart_href": chart_path.relative_to(Config["REPO_PATH"]).as_posix(),
             "csv_href": csv_path.relative_to(Config["REPO_PATH"]).as_posix(),
             "json_href": json_path.relative_to(Config["REPO_PATH"]).as_posix(),
         }
@@ -369,22 +461,52 @@ def main_task(models):
         del close_preds, volume_preds, v_close_preds
         gc.collect()
 
-    update_html(model_results)
+    results_to_return = model_results
+    del df_full, df_for_model, hist_df_for_plot, hist_df_for_metrics
+    gc.collect()
+    return results_to_return
+
+
+def main_task(models, timeframe_keys=None):
+    """Executes one full update cycle."""
+    print("\n" + "=" * 60 + f"\nStarting update task at {datetime.now(timezone.utc)}\n" + "=" * 60)
+    selected_keys = set(timeframe_keys or [tf["key"] for tf in Config["TIMEFRAMES"]])
+    selected_timeframes = [tf for tf in Config["TIMEFRAMES"] if tf["key"] in selected_keys]
+    all_results = {}
+
+    for symbol_config in Config["SYMBOLS"]:
+        all_results[symbol_config["key"]] = {}
+        for timeframe_config in selected_timeframes:
+            all_results[symbol_config["key"]][timeframe_config["key"]] = run_symbol_timeframe_task(
+                models, symbol_config, timeframe_config
+            )
+
+    update_html(all_results)
 
     commit_message = f"Auto-update forecast for {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"
     git_commit_and_push(commit_message)
-
-    del df_full, df_for_model, hist_df_for_plot, hist_df_for_metrics, model_results
-    gc.collect()
 
     print("-" * 60 + "\n--- Task completed successfully ---\n" + "-" * 60 + "\n")
 
 
 def run_scheduler(models):
-    """A continuous scheduler that runs the main task hourly."""
+    """A continuous scheduler that runs update tasks on the shortest configured cadence."""
+    min_schedule_minutes = min(tf["schedule_minutes"] for tf in Config["TIMEFRAMES"])
+
     while True:
         now = datetime.now(timezone.utc)
-        next_run_time = (now + timedelta(hours=1)).replace(minute=0, second=5, microsecond=0)
+        candidate_now_slot = now.replace(second=5, microsecond=0)
+        if now.minute % min_schedule_minutes == 0 and candidate_now_slot > now:
+            next_run_time = candidate_now_slot
+        else:
+            next_minute_multiple = (
+                ((now.minute // min_schedule_minutes) + 1) * min_schedule_minutes
+            )
+            next_run_time = now.replace(second=5, microsecond=0)
+            if next_minute_multiple >= 60:
+                next_run_time = next_run_time.replace(minute=0) + timedelta(hours=1)
+            else:
+                next_run_time = next_run_time.replace(minute=next_minute_multiple)
         sleep_seconds = (next_run_time - now).total_seconds()
 
         if sleep_seconds > 0:
@@ -393,7 +515,12 @@ def run_scheduler(models):
             time.sleep(sleep_seconds)
 
         try:
-            main_task(models)
+            due_timeframes = [
+                tf["key"]
+                for tf in Config["TIMEFRAMES"]
+                if next_run_time.minute % tf["schedule_minutes"] == 0
+            ]
+            main_task(models, timeframe_keys=due_timeframes)
         except Exception as e:
             print(f"\n!!!!!! A critical error occurred in the main task !!!!!!!")
             print(f"Error: {e}")

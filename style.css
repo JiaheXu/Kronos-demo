@@ -151,8 +151,50 @@ section {
 
 .model-sections {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
+}
+
+.symbol-group {
+    margin-top: 2rem;
+}
+
+.symbol-group:first-of-type {
+    margin-top: 0;
+}
+
+.symbol-heading {
+    margin-bottom: 1.25rem;
+}
+
+.symbol-heading h3 {
+    margin-bottom: 0.35rem;
+}
+
+.symbol-heading p {
+    margin: 0;
+    color: var(--subtle-text-color);
+}
+
+.timeframe-group {
+    margin-top: 2rem;
+}
+
+.timeframe-group:first-of-type {
+    margin-top: 0;
+}
+
+.timeframe-heading {
+    margin-bottom: 1.25rem;
+}
+
+.timeframe-heading h3 {
+    margin-bottom: 0.35rem;
+}
+
+.timeframe-heading p {
+    margin: 0;
+    color: var(--subtle-text-color);
 }
 
 .model-panel {

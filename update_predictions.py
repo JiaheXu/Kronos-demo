@@ -372,7 +372,7 @@ def main_task(models):
     update_html(model_results)
 
     commit_message = f"Auto-update forecast for {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"
-    git_commit_and_push(commit_message)
+    # git_commit_and_push(commit_message)
 
     del df_full, df_for_model, hist_df_for_plot, hist_df_for_metrics, model_results
     gc.collect()
